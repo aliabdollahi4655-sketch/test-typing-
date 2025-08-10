@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>تست سرعت تایپ - نسخه نهایی آفلاین</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background-color: #eef2f7;
+      margin: 0;
+      padding: 30px;
+      direction: rtl;
+      text-align: center;
+    }
+    #test-box {
+      background: white;
+      max-width: 1000px;
+      margin: auto;
+      padding: 25px;
+      box-shadow: 0 0 15px #ccc;
+      border-radius: 10px;
+    }
+    h1 {
+      color: #222;
+      margin-bottom: 20px;
+    }
+    #timer {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+    #words-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      background: #f9f9f9;
+      padding: 15px;
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      text-align: center;
+      font-size: 20px;
+    }
+    .word {
+      padding: 5px;
+      border-radius: 5px;
+    }
+    .current {
+      background-color: yellow;
+    }
+    .correct {
+      color: green;
+    }
+    .incorrect {
+      color: red;
+    }
+    #input {
+      margin-top: 20px;
+      font-size: 20px;
+      padding: 10px;
+      width: 80%;
+    }
+    #result {
+      margin-top: 25px;
+      font-size: 18px;
+      color: #0a4d00;
+      text-align: right;
+      line-height: 2;
+    }
+    .stats-box {
+      text-align: right;
+      padding: 10px 20px;
+      font-size: 18px;
+    }
+    #restart-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #restart-btn:hover {
+      background-color: #0d47a1;
+    }
+  </style>
+</head>
+<body>
+  <div id="test-box">
+    <h1>تست سرعت تایپ (نسخه کامل و آفلاین)</h1>
+    <div id="timer">زمان باقی‌مانده: 60 ثانیه</div>
+    <div id="words-container"></div>
+    <input id="input" placeholder="شروع به تایپ کنید..." autofocus />
+    <div id="result" class="stats-box"></div>
+    <button id="restart-btn">🔁 شروع مجدد</button>
+  </div>
+
+  <script>
+    const wordList = [
+      "سلام", "کتاب", "خانه", "ماشین", "دوست", "برنامه", "مدرسه", "دانشجو",
+      "خورشید", "قلم", "گوشی", "رایانه", "لبخند", "کوه", "دریا", "پدر", "مادر",
+      "درس", "موفقیت", "کلاس", "آسمان", "لباس", "موبایل", "فرصت", "مهارت",
+      "دوربین", "خنده", "شب", "روز", "بازی", "کودک", "تایپ", "هوش", "تصویر",
+      "ذهن", "یادگیری", "تمرین", "کتابخانه", "روشنایی", "خاموشی", "رنگ", "پوشاک",
+      "زیبایی", "کامپیوتر", "دقت", "سرعت", "موسیقی", "تصادف", "مهربانی", "دوستی",
+      "شادی", "قانون", "طبیعت", "پرنده", "آزادی", "پنجره", "سفر", "هدف", "توانایی",
+      "سکوت", "قوی", "ضعیف", "غذا", "فکر", "احساس", "قلب", "کار", "حوصله", "معلم",
+      "مدیر", "ساعت", "نرم‌افزار", "مهندس", "دانش", "قدرت", "کلمه", "سرگرمی",
+      "برنده", "بازنده", "مبارزه", "نویسنده", "صفحه", "شکست", "پیشرفت", "رویا"
+    ];
+
+    let words = [], currentIndex = 0;
+    let correctCount = 0, wrongCount = 0, keystrokes = 0;
+    let timeLeft = 60, started = false, interval;
+
+    const wordsContainer = document.getElementById("words-container");
+    const input = document.getElementById("input");
+    const timer = document.getElementById("timer");
+    const result = document.getElementById("result");
+    const restartBtn = document.getElementById("restart-btn");
+
+    function shuffle(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
+
+    function initWords() {
+      const repeatTimes = 8;
+      words = [];
+      for (let i = 0; i < repeatTimes; i++) {
+        words = words.concat(shuffle([...wordList]));
+      }
+      words = words.slice(0, 500);
+
+      wordsContainer.innerHTML = "";
+      words.forEach((word, i) => {
+        const span = document.createElement("span");
+        span.className = "word";
+        span.id = "word-" + i;
+        span.textContent = word;
+        if (i === 0) span.classList.add("current");
+        wordsContainer.appendChild(span);
+      });
+    }
+
+    function startTimer() {
+      started = true;
+      interval = setInterval(() => {
+        timeLeft--;
+        timer.textContent = `زمان باقی‌مانده: ${timeLeft} ثانیه`;
+        if (timeLeft === 0) endTest();
+      }, 1000);
+    }
+
+    function endTest() {
+      clearInterval(interval);
+      input.disabled = true;
+      const totalWords = correctCount + wrongCount;
+      const accuracy = totalWords === 0 ? 0 : Math.round((correctCount / totalWords) * 100);
+      const wpm = correctCount;
+      const topSpeed = wpm;
+      result.innerHTML = `
+        <strong>نتیجه:</strong><br>
+        سرعت تایپ (WPM): <b>${wpm}</b><br>
+        حداکثر سرعت (Top): <b>${topSpeed}</b><br>
+        دقت (Accuracy): <b>${accuracy}%</b><br>
+        ضرب کلید (Keystrokes): <b>${keystrokes}</b><br>
+        کلمات درست: <b>${correctCount}</b><br>
+        کلمات اشتباه: <b>${wrongCount}</b><br>
+      `;
+    }
+
+    function resetTest() {
+      clearInterval(interval);
+      timeLeft = 60;
+      currentIndex = 0;
+      correctCount = 0;
+      wrongCount = 0;
+      keystrokes = 0;
+      started = false;
+      input.disabled = false;
+      input.value = "";
+      result.innerHTML = "";
+      timer.textContent = `زمان باقی‌مانده: 60 ثانیه`;
+      initWords();
+      input.focus();
+    }
+
+    input.addEventListener("input", () => {
+      if (!started) startTimer();
+      keystrokes++;
+
+      if (input.value.endsWith(" ")) {
+        const typed = input.value.trim();
+        const currentWord = words[currentIndex];
+        const span = document.getElementById("word-" + currentIndex);
+
+        if (typed === currentWord) {
+          span.classList.add("correct");
+          correctCount++;
+        } else {
+          span.classList.add("incorrect");
+          wrongCount++;
+        }
+
+        span.classList.remove("current");
+        currentIndex++;
+        const next = document.getElementById("word-" + currentIndex);
+        if (next) next.classList.add("current");
+
+        input.value = "";
+      }
+    });
+
+    restartBtn.addEventListener("click", resetTest);
+
+    initWords();
+  </script>
+</body>
+</html>
