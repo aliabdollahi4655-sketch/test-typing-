@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>دانلود برنامه تست سرعت تایپ</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; margin-top: 100px;">
+  <h1>تست سرعت تایپ</h1>
+  <p>برای دانلود تست سرعت تایپ روی دکمه زیر کلیک کنید:</p>
+  <a href="index.html" download style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">دانلود برنامه تست سرعت تایپ</a>
+</body>
+</html>
