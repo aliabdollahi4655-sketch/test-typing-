@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>دانلود برنامه تست سرعت تایپ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin-top: 100px;
+      direction: rtl;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>تست سرعت تایپ</h1>
+  <p>برای دانلود تست سرعت تایپ روی دکمه زیر کلیک کنید:</p>
+  <button onclick="downloadFile()">دانلود برنامه تست سرعت تایپ</button>
+
+  <script>
+    function downloadFile() {
+      fetch('index.html') // مسیر فایل
+        .then(response => response.blob())
+        .then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'index.html'; // اسم فایل هنگام دانلود
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        });
+    }
+  </script>
+</body>
+</html>
